@@ -89,6 +89,7 @@ func TestNewFactory(t *testing.T) {
 			}
 			if id0.String() == id1.String() {
 				t.Errorf("ids must be unique: index: %v id:%v", i, id0)
+				break
 			}
 		}
 	}
