@@ -9,10 +9,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Install Go
-      uses: actions/setup-go
+      uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.go-version }}
     - name: Check out code
-      uses: actions/checkout
+      uses: actions/checkout@v2
     - name: Test
       run: go test -race ./...
