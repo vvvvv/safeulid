@@ -1,5 +1,4 @@
 // Package safeulid provides concurrent safe functions for generating monotonic ulids
-
 package safeulid
 
 import (
@@ -25,6 +24,7 @@ var DefaultEntropyReader = &EntropyReader{
 
 var ids = NewDefaultFactory()
 
+// IDFactory represents a concurrently safe way to generate new ids
 type IDFactory struct {
 	pool sync.Pool
 }
@@ -43,18 +43,19 @@ func NewFactory(entropy *EntropyReader) *IDFactory {
 	return f
 }
 
+// NewDefaultFactory returns a new IDFactory from a DefaultEntropyReader
 func NewDefaultFactory() *IDFactory {
 	// return NewFactory(newSafeRand())
 	return NewFactory(DefaultEntropyReader)
 }
 
 // New returns a monotonic ID and an error.
-//
 func (i *IDFactory) New() (ID, error) {
 	return i.new(clck{})
 
 }
 
+// MustNew like New but panics on error.
 func (i *IDFactory) MustNew() ID {
 	return i.mustNew(clck{})
 }
