@@ -11,13 +11,19 @@ import (
 	"github.com/oklog/ulid/v2"
 )
 
-// DefaultEntropyReader returns a io.Reader which is being used as a source of entropy.
-// Defaults to rand.New()
-var DefaultEntropyReader func() io.Reader = func() io.Reader {
-	return rand.New(rand.NewSource(time.Now().UnixNano()))
+// EntropyReader is a factory for creating new sources of random entropy.
+type EntropyReader struct {
+	New func() io.Reader
 }
 
-var ids = NewFactory(nil)
+// DefaultEntropyReader is the default EntropyReader factory.
+var DefaultEntropyReader = &EntropyReader{
+	New: func() io.Reader {
+		return rand.New(rand.NewSource(time.Now().UnixNano()))
+	},
+}
+
+var ids = NewDefaultFactory()
 
 type IDFactory struct {
 	pool sync.Pool
@@ -26,15 +32,20 @@ type IDFactory struct {
 // NewFactory returns a new IDFactory which can be concurrently accessed to to generate monotonic ulids.
 // If entropy is Nil DefaultEntropySource is used.
 // Use only if you have the need to generate ids from multiple different entropy sources or else use New() or MustNew().
-func NewFactory(entropy io.Reader) *IDFactory {
-	f := new(IDFactory)
+func NewFactory(entropy *EntropyReader) *IDFactory {
 	if entropy == nil {
-		entropy = DefaultEntropyReader()
+		panic("entropy must not be nil")
 	}
+	f := new(IDFactory)
 	f.pool.New = func() interface{} {
-		return ulid.Monotonic(entropy, 0)
+		return ulid.Monotonic(entropy.New(), 0)
 	}
 	return f
+}
+
+func NewDefaultFactory() *IDFactory {
+	// return NewFactory(newSafeRand())
+	return NewFactory(DefaultEntropyReader)
 }
 
 // New returns a monotonic ID and an error.
