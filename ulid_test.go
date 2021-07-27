@@ -44,8 +44,8 @@ func TestNewFactory(t *testing.T) {
 	}
 	_ = id
 
-	p := 16 // number of parallel coroutines
-	number_of_ids := 10
+	p := 2 // number of parallel coroutines
+	number_of_ids := 5
 	var mu sync.Mutex
 	// all := make([]ID, p*number_of_ids)
 	var all []ID
